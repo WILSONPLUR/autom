@@ -9,6 +9,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { FormControl, FormField, FormItem, FormLabel, Form} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { signIn } from "@/lib/auth-client";
+import { mdiGoogle } from "@mdi/js";
+import Icon from "@mdi/react";
 
 const loginSchema = z.object({
     email: z.string().min(1, "Email is required").email("Invalid email address"),
@@ -47,6 +49,22 @@ const LoginForm = () => {
 
         })
     }
+
+    const onGoogleSignIn = async () => {
+        await signIn.social({
+            provider: 'google',
+            callbackURL: '/',
+            fetchOptions: {
+                onSuccess: () => {
+                    router.push('/');
+                    toast.success("Logged in successfully");
+                },
+                onError: (ctx) => {
+                    toast.error(ctx.error.message);
+                }
+            }
+        })
+    }
     return (
         <div className="flex flex-col gap-6 w-full h-screen items-center justify-center">
             <Card className="w-xl">
@@ -54,6 +72,10 @@ const LoginForm = () => {
                 <CardTitle>Welcome back, Login to continue</CardTitle>
             </CardHeader>
             <CardContent>
+                <Button onClick={onGoogleSignIn} variant="outline" className="w-full mb-4 flex items-center justify-center gap-2">
+                     Sign in with Google
+                    <Icon path={mdiGoogle} />
+                </Button>
                 <Form {...form}>
                     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
                         <FormField control={form.control} name="email" render={(
