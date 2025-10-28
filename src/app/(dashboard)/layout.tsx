@@ -1,3 +1,4 @@
+import AppSidebar from '@/components/ui/app-sidebar';
 import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
 import React from 'react'
 
@@ -8,6 +9,7 @@ interface LayoutProps {
 const Layout = ({children}: LayoutProps) => {
   return (
     <SidebarProvider>
+        <AppSidebar/>
         <SidebarInset className='bg-accent/20'>{children}</SidebarInset>
     </SidebarProvider>
   )

@@ -1,4 +1,4 @@
-import { LoginForm } from '@/app/features/auth/components/form/loginForm'
+import { LoginForm } from '@/features/auth/components/form/loginForm'
 import { requireUnauth } from '@/lib/auth-utils'
 import React from 'react'
 

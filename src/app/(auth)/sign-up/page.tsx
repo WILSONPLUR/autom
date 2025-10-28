@@ -1,4 +1,4 @@
-import { RegisterForm } from '@/app/features/auth/components/form/registerForm'
+import { RegisterForm } from '@/features/auth/components/form/registerForm'
 import { requireUnauth } from '@/lib/auth-utils'
 import React from 'react'
 
