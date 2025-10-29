@@ -8,49 +8,55 @@ import {Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { FormControl, FormField, FormItem, FormLabel, Form} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { signIn } from "@/lib/auth-client";
-import { mdiGoogle } from "@mdi/js";
-import Icon from "@mdi/react";
+import { signIn, signUp } from "@/lib/auth-client";
+import {Icon} from "@mdi/react";
+import { mdiGoogle } from '@mdi/js'; 
+import Link from "next/link";
 
-const loginSchema = z.object({
+const registerSchema = z.object({
     email: z.string().min(1, "Email is required").email("Invalid email address"),
     password: z.string().min(1, "Password is required").min(6, "Password must be at least 6 characters"),
+    confirmPassword: z.string().min(1, "Confirm Password is required"),
+}).refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords don't match",
+    path: ["confirmPassword"],
 })
 
-type LoginFormValues = z.infer<typeof loginSchema>;
+type RegisterFormValues = z.infer<typeof registerSchema>;
 
-const LoginForm = () => {
+const RegisterForm = () => {
     const router = useRouter();
-    const form = useForm<LoginFormValues>({
-        resolver: zodResolver(loginSchema),
+    const form = useForm<RegisterFormValues>({
+        resolver: zodResolver(registerSchema),
         defaultValues: {
             email: "",
             password: "",
+            confirmPassword: "",
         },
     });
 
     const isPending = form.formState.isSubmitting;
 
-    const onSubmit = async (values: LoginFormValues) => {
+    const onSubmit = async (values: RegisterFormValues) => {
         const {email, password} = values;
-        await signIn.email({
-            email: email,
-            password: password,
-            callbackURL: '/',
-            fetchOptions: {
-                onSuccess: () => {
-                    router.push('/');
-                    toast.success("Logged in successfully");
-                },
-                onError: (ctx) => {
-                    toast.error(ctx.error.message);
+            await signUp.email({
+                email: email,
+                password: password,
+                name: email,
+                callbackURL: '/',
+                fetchOptions: {
+                    onSuccess: () => {
+                        router.push('/');
+                        toast.success("Account created successfully");
+                    },
+                    onError: (error) => {
+                        toast.error("Something went wrong: " + error);
+                        console.log(error);
+                    }
                 }
-            }
-
-        })
+            });
     }
-
-    const onGoogleSignIn = async () => {
+    const onGoogleSignUp = async () => {
         await signIn.social({
             provider: 'google',
             callbackURL: '/',
@@ -69,12 +75,12 @@ const LoginForm = () => {
         <div className="flex flex-col gap-6 w-full h-screen items-center justify-center">
             <Card className="w-xl">
             <CardHeader className="text-center">
-                <CardTitle>Welcome back, Login to continue</CardTitle>
+                <CardTitle>Register new account</CardTitle>
             </CardHeader>
             <CardContent>
-                <Button onClick={onGoogleSignIn} variant="outline" className="w-full mb-4 flex items-center justify-center gap-2">
-                     Sign in with Google
-                    <Icon path={mdiGoogle} />
+                <Button onClick={onGoogleSignUp} variant="outline" className="w-full mb-4 flex items-center justify-center gap-2">
+                           Sign up with Google
+                           <Icon path={mdiGoogle} />
                 </Button>
                 <Form {...form}>
                     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -98,15 +104,26 @@ const LoginForm = () => {
                         </FormItem>
                         )
                     )} />
+                    <FormField control={form.control} name="confirmPassword" render={(
+                        ({field}) => (
+                        <FormItem>
+                            <FormLabel>Confirm Password:</FormLabel>
+                            <FormControl>
+                                <Input type="password" {...field} placeholder="********" />
+                            </FormControl>
+                        </FormItem>
+                        )
+                    )} />
                     <Button type="submit" disabled={isPending} className="w-full mt-4">
-                        {isPending ? "Logging in..." : "Login"}
+                        {isPending ? "Loading..." : "Sign Up"}
                     </Button>
                     </form>
                 </Form>
+                <div className="flex justify-center items-center gap-2 mt-5"><span className="text-sm text-muted-foreground">Already have an account ?</span> <Link className="text-primary underline" href="/login">Sign in</Link></div>
             </CardContent>
         </Card>
         </div>
     );
 }
 
-export {LoginForm};
+export {RegisterForm};
