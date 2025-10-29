@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input";
 import { signIn, signUp } from "@/lib/auth-client";
 import {Icon} from "@mdi/react";
 import { mdiGoogle } from '@mdi/js'; 
+import Link from "next/link";
 
 const registerSchema = z.object({
     email: z.string().min(1, "Email is required").email("Invalid email address"),
@@ -118,6 +119,7 @@ const RegisterForm = () => {
                     </Button>
                     </form>
                 </Form>
+                <div className="flex justify-center items-center gap-2 mt-5"><span className="text-sm text-muted-foreground">Already have an account ?</span> <Link className="text-primary underline" href="/login">Sign in</Link></div>
             </CardContent>
         </Card>
         </div>
