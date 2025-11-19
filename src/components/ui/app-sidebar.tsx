@@ -1,8 +1,10 @@
+'use client';
 import {  SidebarIcon } from 'lucide-react';
 import React from 'react'
 import {Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarHeader, SidebarMenuButton, SidebarMenuItem } from './sidebar';
 import Link from 'next/link';
 import LogoutButton from '@/app/logoutButton';
+import { useHasActiveSubscriptions } from '@/hooks/use-subscription';
 
 const menuItems = [
     {
@@ -32,12 +34,13 @@ const menuItems = [
 ]
 
 const AppSidebar = () => {
+    const {hasActiveSubs, isLoading} = useHasActiveSubscriptions();
   return (
     <Sidebar collapsible='icon' draggable>
         <SidebarHeader>
             <SidebarMenuItem>
                 <SidebarMenuButton>
-                    Autom 
+                    Autom {isLoading ? "Loading..." : hasActiveSubs ? "Pro" : "Free"}
                 </SidebarMenuButton>
             </SidebarMenuItem>
         </SidebarHeader>
@@ -57,7 +60,7 @@ const AppSidebar = () => {
                     </SidebarGroupContent>
             ))} 
             </SidebarGroup> 
-            <LogoutButton/>      
+            <LogoutButton className='w-[88%] mx-auto absolute bottom-2 left-4' />      
         </SidebarContent>
     </Sidebar>
   )

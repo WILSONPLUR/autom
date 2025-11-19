@@ -3,6 +3,6 @@ import { prefetch, trpc } from "@/trpc/server";
 type Input = inferInput<typeof trpc.workflows.getAll>;
 
 
-export const prefetchworkflows = (params: Input) => {
-return prefetch(trpc.workflows.getAll.queryOptions (params))
+export const prefetchworkflows = async (params: Input) => {
+  return await prefetch(trpc.workflows.getAll.queryOptions(params));
 }
