@@ -15,8 +15,10 @@ import { useUpgradeModal } from "../hooks/use-upgrade-modal";
 import { useRouter } from "next/navigation";
 import { useWorkflowsParams } from "../hooks/use-workflows-params";
 import { useEntitySearch } from "@/hooks/use-entity-search";
+import { useRemoveWorkflow } from "../hooks/use-workflow";
 import type { Workflow } from "@prisma/client";
 import { WorkflowIcon } from "lucide-react";
+import { formatDistanceToNow } from "date-fns";
 
 const WorkflowsSearch = () => {
   const [params, setParams] = useWorkflowsParams();
@@ -39,7 +41,7 @@ const WorkflowsPagination = () => {
   return (
     <EntityPagination
       disabled={workflows.isFetching}
-      page={workflows.data.page}
+      page={workflows.data.page || 1}
       totalPages={workflows.data.totalPages}
       onPageChange={(page) => setParams({ ...params, page })}
     />
@@ -78,18 +80,29 @@ export const WorkflowsEmpty = () => {
 };
 
 export const WorkflowItem = ({ data }: { data: Workflow }) => {
+  const removeWorkflow = useRemoveWorkflow();
+
+  const handleRemove= (data: Workflow) => {
+    removeWorkflow.mutate({id: data.id});
+  }
   return (
     <EntityItem
       href={`/workflows/${data.id}`}
       title={data.name}
-      subtitle="TODO"
+      subtitle={
+        <>
+          Updated {formatDistanceToNow(data.updatedAt, { addSuffix: true })}{" "}
+          &bull; Created{" "}
+          {formatDistanceToNow(data.createdAt, { addSuffix: true })}
+        </>
+      }
       image={
         <div className="size-8 flex items-center justify-center">
           <WorkflowIcon className="size-5 text-muted-foreground" />
         </div>
       }
-      onRemove={() => {}}
-      isRemoving={false}
+      onRemove={() => handleRemove(data)}
+      isRemoving={removeWorkflow.isPending}
     />
   );
 };
