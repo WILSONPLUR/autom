@@ -4,7 +4,11 @@ import { signOut } from '@/lib/auth-client';
 import React from 'react'
 import { toast } from 'sonner';
 
-const LogoutButton = () => {
+interface LogoutButtonProps {
+  className?: string;
+}
+
+const LogoutButton = ({className}: LogoutButtonProps) => {
     const logOut = async () => {
     await signOut({
        fetchOptions: {
@@ -19,7 +23,7 @@ const LogoutButton = () => {
     });
   }
   return (
-    <Button onClick={logOut}>Logout</Button>
+    <Button onClick={logOut} className={`${!!className && className}`}>Logout</Button>
   )
 }
 
