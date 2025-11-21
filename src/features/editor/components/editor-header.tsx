@@ -32,14 +32,14 @@ export const EditorNameInput = ({ workflowId }: { workflowId: string }) => {
   const { data: workflow } = useSuspenseWorkflow(workflowId);
   const updateWorkflow = useUpdateWorkflowName();
   const [isEditing, setIsEditing] = useState(false);
-  const [name, setName] = useState(workflow.name);
+  const [name, setName] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    if (workflow.name) {
+    if (workflow?.name) {
       setName(workflow.name);
     }
-  }, [workflow.name]);
+  }, [workflow]);
   useEffect(() => {
     if (isEditing && inputRef.current) {
       inputRef.current.focus();
@@ -48,8 +48,10 @@ export const EditorNameInput = ({ workflowId }: { workflowId: string }) => {
   }, [isEditing]);
 
   const handleSave = async () => {
+    if (!workflow) return;
     if (name === workflow.name) {
       setIsEditing(false);
+      return;
     }
     setIsEditing(false);
     try {
@@ -63,7 +65,9 @@ export const EditorNameInput = ({ workflowId }: { workflowId: string }) => {
     if (e.key === "Enter") {
       handleSave();
     } else if (e.key === "Escape") {
-      setName(workflow.name);
+      if (workflow) {
+        setName(workflow.name);
+      }
       setIsEditing(false);
     }
   };
@@ -81,8 +85,12 @@ export const EditorNameInput = ({ workflowId }: { workflowId: string }) => {
       />
     );
   }
+  if (!workflow) {
+    return <BreadcrumbItem>Loading...</BreadcrumbItem>;
+  }
+
   return (
-    <BreadcrumbItem onClick={() => setIsEditing(true)} className="cursor-pointer hover:text-foreground-transition-colors">
+    <BreadcrumbItem onClick={() => setIsEditing(true)} className="cursor-pointer hover:text-foreground transition-colors">
       {workflow.name}
     </BreadcrumbItem>
   );
