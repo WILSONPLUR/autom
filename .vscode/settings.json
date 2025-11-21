@@ -1,4 +1,5 @@
 {
     "editor.formatOnSave": true,
-    "notebook.formatOnSave.enabled": true
+    "notebook.formatOnSave.enabled": true,
+    "prisma.pinToPrisma6": true
 }
