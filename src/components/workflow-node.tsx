@@ -27,7 +27,7 @@ export function WorkflowNode({
           <Button
             size="sm"
             variant="ghost"
-            onClick={onDelete}
+            onClick={onSettings}
             className={"mr-2"}
           >
             <SettingsIcon />
@@ -46,7 +46,7 @@ export function WorkflowNode({
         >
           <p className="font-medium">{name}</p>
           {description && (
-            <p className="text-muted-foreground trunacte text-sm">
+            <p className="text-muted-foreground truncate text-sm">
               {description}
             </p>
           )}

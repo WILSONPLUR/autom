@@ -67,6 +67,26 @@ export const useUpdateWorkflowName = () => {
   );
 };
 
+// Update workflow hook
+export const useUpdateWorkflow = () => {
+  const trpc = useTRPC();
+  const queryClient = useQueryClient();
+  return useMutation(
+    trpc.workflows.update.mutationOptions({
+      onSuccess: (data) => {
+        toast.success(`Workflow "${data.name}" was saved`);
+        queryClient.invalidateQueries(trpc.workflows.getAll.queryOptions({}));
+        queryClient.invalidateQueries(
+          trpc.workflows.getOne.queryOptions({ id: data.id })
+        );
+      },
+      onError: (data) => {
+        toast.error(data.message);
+      },
+    })
+  );
+};
+
 export const useSuspenseWorkflow = (id: string) => {
   const trpc = useTRPC();
   return useSuspenseQuery(trpc.workflows.getOne.queryOptions({ id }));
