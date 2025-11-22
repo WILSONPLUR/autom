@@ -23,12 +23,12 @@ const menuItems = [
         title: "Workflows",
         items: [
             {
-                title: "Workflows",
-                href: "/workflows",
+                title: "Settings",
+                href: "/settings",
                 id: 1
             }
         ],
-        href: "/workflows",
+        href: "/settings",
         id: 2
     },
 ]

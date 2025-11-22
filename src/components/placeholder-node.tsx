@@ -18,6 +18,7 @@ export function PlaceholderNode({ children, onClick }: PlaceholderNodeProps) {
 
   return (
     <BaseNode
+      status="initial"
       className="bg-card w-auto h-auto border-dashed border-gray-400 p-2 text-center text-gray-400 shadow-none cursor-pointer"
       onClick={onClick}
     >

@@ -58,7 +58,7 @@ export const workflowsRouter = createTRPCRouter({
         id: workflow.id,
         name: workflow.name,
         nodes,
-        edges
+        edges,
       };
     }),
   getAll: protectedProcedure
@@ -143,6 +143,93 @@ export const workflowsRouter = createTRPCRouter({
         data: {
           name: input.name,
         },
+      });
+    }),
+  update: protectedProcedure
+    .input(
+      z.object({
+        nodes: z.array(
+          z.object({
+            id: z.string(),
+            type: z.string().nullish(),
+            position: z.object({
+              x: z.number(),
+              y: z.number(),
+            }),
+            data: z.record(z.string(), z.any().optional()),
+          })
+        ),
+        edges: z.array(
+          z.object({
+            source: z.string(),
+            target: z.string(),
+            sourceHandle: z.string().nullish(),
+            targetHandle: z.string().nullish(),
+          })
+        ),
+        id: z.string(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const { id, nodes, edges } = input;
+      const workflow = await prisma.workflow.findUniqueOrThrow({
+        where: { id, userId: ctx.auth.user.id },
+      });
+
+      // Transaction
+      return prisma.$transaction(async (tx) => {
+        // Delete existing connections first (due to foreign key constraints)
+        await tx.connection.deleteMany({
+          where: {
+            workflowId: id,
+          },
+        });
+        
+        // Delete existing nodes
+        await tx.node.deleteMany({
+          where: {
+            workflowId: id,
+          },
+        });
+        
+        // Create new nodes sequentially to ensure they exist before connections
+        for (const node of nodes) {
+          await tx.node.create({
+            data: {
+              id: node.id,
+              workflowId: id,
+              type: node.type as NodeType,
+              name: node.type || "unknown",
+              position: node.position,
+              data: node.data || {},
+            },
+          });
+        }
+        
+        // Create new connections only if there are edges
+        if (edges.length > 0) {
+          await tx.connection.createMany({
+            data: edges.map((edge) => ({
+              workflowId: id,
+              fromNodeId: edge.source,
+              toNodeId: edge.target,
+              fromOutput: edge.sourceHandle || "main",
+              toInput: edge.targetHandle || "main",
+            })),
+          });
+        }
+        
+        // Update workflow's updateAt timestamp
+        await tx.workflow.update({
+          where: {
+            id,
+          },
+          data: {
+            updatedAt: new Date(),
+          },
+        });
+        // Return workflow
+        return workflow;
       });
     }),
 });
